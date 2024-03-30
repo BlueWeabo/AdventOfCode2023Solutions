@@ -15,6 +15,9 @@ void remove_spaces(char* s) {
     } while (*s++ = *d++);
 }
 
+int max(int a, int b) {
+    return a > b ? a : b;
+}
 
 int main() {
     FILE *input = fopen("../inputs/dayTwo.txt", "r");
@@ -30,15 +33,13 @@ int main() {
     char line[200];
     memset(line, '\n', sizeof(line));
     while (fgets(line, sizeof(line), input) != NULL) {
-        //printf("%s", line);
         remove_spaces(line);
-        //printf("Game: %s \n", line);
-        int current = atoi(line+4);
-        //printf("Id: %d \n", current);
-        int valid = 1;
 
         char *game = strchr(line, ':') + 1;
-        printf("%s", game);
+
+        int neededBlue = 0;
+        int neededRed = 0;
+        int neededGreen = 0;
 
         char *sets = malloc(sizeof(char) * strlen(game));
         if (sets == NULL) {
@@ -58,15 +59,17 @@ int main() {
             memset(set, '\n', strlen(sets));
             set = strtok_r(sets, ",", &settok);
             while (set != NULL) {
-                printf("setPart: %s \n", set);
                 if (strstr(set, "blue")) {
-                    if (atoi(set) > MAX_BLUE) valid = 0;
+                    int blue = atoi(set);
+                    neededBlue = max(blue, neededBlue);
                 }
                 if (strstr(set, "red")) {
-                    if (atoi(set) > MAX_RED) valid = 0;
+                    int red = atoi(set);
+                    neededRed = max(red, neededRed);
                 }
                 if (strstr(set, "green")) {
-                    if (atoi(set) > MAX_GREEN) valid = 0;
+                    int green = atoi(set);
+                    neededGreen = max(green, neededGreen);
                 }
                 set = strtok_r(NULL, ",", &settok);
             }
@@ -75,8 +78,10 @@ int main() {
             free(set);
         }
         free(sets);
-
-        if (valid) total+=current;
+        printf("red: %d \n", neededRed);
+        printf("green: %d \n", neededGreen);
+        printf("blue: %d \n", neededBlue);
+        total += (neededBlue * neededGreen * neededRed);
     }
     printf("Total: %d \n", total);
     fclose(input);
